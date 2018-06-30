@@ -12,7 +12,7 @@
 
 
 (load "cffi.lisp")
-
+(load "ui.lisp")
 
 (defparameter *class-slots* (make-hash-table))
 

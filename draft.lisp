@@ -63,10 +63,34 @@
                      *sdl2-surface*
                      (sdl2:make-rect x y 128 128)))
 
+
+
+(sdl2:get-renderer *sdl2-window*)
+
+(sdl2:set-render-draw-blend-mode *sdl2-renderer* :blend)
 (progn
   (clear)
-  (show-earth-at 10 10)
-  (show-earth-at 80 80)
+  (show-earth-at -20 -20)
+  (show-earth-at 50 50)
+  (sdl2:set-render-draw-color *sdl2-renderer* 150 0 0 128)
+  (sdl2:render-fill-rect *sdl2-renderer*
+                         (sdl2:make-rect 30 30 128 128))
+  (sdl2:blit-surface *text-surface* nil *sdl2-surface* nil)
   (update))
 
 (close-window)
+
+(sdl2-ttf-init)
+(defparameter *font-default*
+  (open-ttf "/usr/share/fonts/TTF/DejaVuSansMono.ttf" 16))
+
+(sdl2:map-rgb  (sdl2:surface-format *sdl2-surface*) 1 2 3)
+
+(set-font-style *font-default* '(:normal))
+
+(defparameter *text-surface*
+  (render-text-as-surface "The quick brown fox jumps over the lazy dog, 你好世界"
+                          *font-default*
+                          0 0 255))
+(sdl2:surface-width *text-surface*)
+(sdl2:surface-height *text-surface*)
