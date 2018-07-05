@@ -20,11 +20,11 @@
   (clear)
   (update))
 
-(defun close-window ()
-  (sdl2:free-surface *sdl2-surface*)
-  (sdl2:destroy-window *sdl2-window*)
-  (setf *sdl2-surface* nil)
-  (setf *sdl2-window* nil))
+;; (defun close-window ()
+;;   (sdl2:free-surface *sdl2-surface*)
+;;   (sdl2:destroy-window *sdl2-window*)
+;;   (setf *sdl2-surface* nil)
+;;   (setf *sdl2-window* nil))
 
 (defun make-surface (ptr)
   (sdl2-ffi::make-sdl-surface :ptr ptr))
