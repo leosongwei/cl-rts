@@ -15,7 +15,7 @@
                                           :w *w* :h *h*
                                           :flags '(:shown)))
   (setf *sdl2-surface* (sdl2:get-window-surface *sdl2-window*))
-  (setf *sdl2-renderer* (sdl2:create-renderer *sdl2-window* -1 '(:software)))
+  (setf *sdl2-renderer* (sdl2:create-renderer *sdl2-window* -1 '(:accelerated)))
   (sdl2:set-render-draw-blend-mode *sdl2-renderer* :blend)
   (clear)
   (update))
@@ -63,10 +63,8 @@
 (defun open-ttf (path ptsize)
   (cffi:with-foreign-string (filepath path)
     (sdl2-ttf-openfont filepath ptsize)))
-
-(cffi:defcfun ("TTF_CloseFont" sdl2-ttf-closefont) :void
+(cffi:defcfun ("TTF_CloseFont" close-ttf) :void
   (font :pointer))
-(defun close-ttf (
 
 (cffi:defcfun ("TTF_RenderUTF8_Blended" sdl2-render-utf8-blended) :pointer
   (font :pointer) (string :pointer) (fg-color :uint32))
