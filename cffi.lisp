@@ -83,3 +83,50 @@
                       (:strikethroug 8)
                       (otherwise 0)))))
     (sdl2-ttf-setfontstyle font style)))
+
+;; sdl2-event
+
+;; typedef enum
+;; {
+;;     SDL_ADDEVENT,  // 0
+;;     SDL_PEEKEVENT, // 1
+;;     SDL_GETEVENT   // 2
+;; } SDL_eventaction;
+
+(cffi:defcfun ("SDL_PeepEvents" sdl2-peep-events) :int
+  (events :pointer)
+  (num-events :int)
+  (action :int)
+  (min-type :uint32)
+  (max-type :uint32))
+
+(cffi:defcfun ("SDL_FlushEvents" sdl2-flushevents) :void
+  (min-type :uint32)
+  (max-type :uint32))
+
+(cffi:defcfun ("SDL_WaitEvent" sdl2-waitevent) :int
+  (event-ptr :pointer))
+
+(defun flush-events ()
+  (sdl2-flushevents #.(sdl2::enum-value 'sdl2-ffi:sdl-event-type :firstevent)
+                    #.(sdl2::enum-value 'sdl2-ffi:sdl-event-type :lastevent)))
+
+(defun get-next-event ()
+  "SDL2 shares a global event queue, all events from all windows
+   are in this queue.
+   The event get from this function must be free, after use."
+  (let* ((event (sdl2:new-event))
+         (event-ptr (sdl2-ffi::sdl-event-ptr event)))
+    (sdl2-peep-events event-ptr
+                      1
+                      #.(sdl2::enum-value 'sdl2-ffi::sdl-eventaction :getevent)
+                      #.(sdl2::enum-value 'sdl2-ffi:sdl-event-type :firstevent)
+                      #.(sdl2::enum-value 'sdl2-ffi:sdl-event-type :lastevent))
+    event))
+
+(defun wait-sdl-event ()
+  (let* ((event (sdl2:new-event))
+         (event-ptr (sdl2-ffi::sdl-event-ptr event)))
+    (sdl2-waitevent event-ptr)
+    event))
+

@@ -15,6 +15,8 @@
             :accessor window-max-fps)
    (sdl2-window :initform nil
                 :accessor window-sdl2-window)
+   (sdl2-window-id :initform -1
+                   :accessor window-sdl2-window-id)
    (sdl2-renderer :initform nil
                   :accessor window-sdl2-renderer)
    (sdl2-surface :initform nil
@@ -30,6 +32,8 @@
   (mvb-let* ((w h (sdl2:get-renderer-output-size (window-sdl2-renderer window))))
     (setf (window-size-w window) w)
     (setf (window-size-h window) h)
+
+    ;;(sdl2:set-window-size (window-sdl2-window window) w h)
     (values w h)))
 
 (defun close-window (window)
@@ -57,6 +61,8 @@
                                               '(:accelerated))))
     (setf (window-sdl2-window window) sdl2-window)
     (setf (window-sdl2-renderer window) sdl2-renderer)
+    (setf (window-sdl2-window-id window)
+          (sdl2:get-window-id sdl2-window))
     (window-resize-handler window)
     (sdl2:set-render-draw-blend-mode sdl2-renderer :blend)
     window))
