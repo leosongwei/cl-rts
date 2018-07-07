@@ -26,15 +26,12 @@
    (thread :initform nil
            :accessor window-thread)))
 
-(defun window-resize-handler (window)
+(defun window-resize-handler (window w h)
+  (sdl2:set-window-size (window-sdl2-window window) w h)
   (setf (window-sdl2-surface window)
         (sdl2:get-window-surface (window-sdl2-window window)))
-  (mvb-let* ((w h (sdl2:get-renderer-output-size (window-sdl2-renderer window))))
-    (setf (window-size-w window) w)
-    (setf (window-size-h window) h)
-
-    ;;(sdl2:set-window-size (window-sdl2-window window) w h)
-    (values w h)))
+  (setf (window-size-w window) w)
+  (setf (window-size-h window) h))
 
 (defun close-window (window)
   (if (typep (window-thread window)
