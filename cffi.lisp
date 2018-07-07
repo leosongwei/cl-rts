@@ -1,32 +1,15 @@
 (defun init-sdl2 ()
   (sdl2:init :everything))
+;;(init-sdl2)
 
-(defun clear ()
-  (let ((format (sdl2:surface-format *sdl2-surface*)))
-    (sdl2:fill-rect *sdl2-surface*
-                    nil
-                    (sdl2:map-rgb format 0 0 0))))
+(defun make-surface (w h)
+  (sdl2:create-rgb-surface w h 32
+                           :r-mask #xff000000
+                           :g-mask #x00ff0000
+                           :b-mask #x0000ff00
+                           :a-mask #x000000ff))
 
-(defun update()
-  (sdl2:update-window *sdl2-window*))
-
-(defun init-window (&key (title "CL-RTS"))
-  (setf *sdl2-window* (sdl2:create-window :title title
-                                          :w *w* :h *h*
-                                          :flags '(:shown)))
-  (setf *sdl2-surface* (sdl2:get-window-surface *sdl2-window*))
-  (setf *sdl2-renderer* (sdl2:create-renderer *sdl2-window* -1 '(:accelerated)))
-  (sdl2:set-render-draw-blend-mode *sdl2-renderer* :blend)
-  (clear)
-  (update))
-
-;; (defun close-window ()
-;;   (sdl2:free-surface *sdl2-surface*)
-;;   (sdl2:destroy-window *sdl2-window*)
-;;   (setf *sdl2-surface* nil)
-;;   (setf *sdl2-window* nil))
-
-(defun make-surface (ptr)
+(defun make-surface-from-ptr (ptr)
   (sdl2-ffi::make-sdl-surface :ptr ptr))
 
 ;; SDL2_image
@@ -51,7 +34,7 @@
     (let ((surface-ptr (sdl2-img-load filepath-c)))
       (if (cffi:null-pointer-p surface-ptr)
           (error (format nil "Image \"~A\" Load Failed" filepath))
-          (make-surface surface-ptr)))))
+          (make-surface-from-ptr surface-ptr)))))
 
 ;; SDL2_ttf
 (cffi:load-foreign-library "libSDL2_ttf.so")

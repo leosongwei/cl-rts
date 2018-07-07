@@ -17,14 +17,20 @@
                 :accessor window-sdl2-window)
    (sdl2-renderer :initform nil
                   :accessor window-sdl2-renderer)
+   (sdl2-surface :initform nil
+                 :accessor window-sdl2-surface)
    (frames :initform nil
            :accessor window-frames)
    (thread :initform nil
            :accessor window-thread)))
 
 (defun window-resize-handler (window)
-  (sdl2:get-window-surface (window-sdl2-window window))
-  (sdl2:get-renderer-output-size (window-sdl2-renderer window)))
+  (setf (window-sdl2-surface window)
+        (sdl2:get-window-surface (window-sdl2-window window)))
+  (mvb-let* ((w h (sdl2:get-renderer-output-size (window-sdl2-renderer window))))
+    (setf (window-size-w window) w)
+    (setf (window-size-h window) h)
+    (values w h)))
 
 (defun close-window (window)
   (if (typep (window-thread window)
@@ -34,6 +40,9 @@
   (sdl2:destroy-window (window-sdl2-window window))
   (setf (window-sdl2-renderer window) nil)
   (setf (window-sdl2-window window) nil))
+
+(defun clear-window (window)
+  (sdl2:render-clear (window-sdl2-renderer window)))
 
 (defun update-window (window)
   (sdl2:render-present (window-sdl2-renderer window)))
@@ -46,11 +55,9 @@
                                           :flags '(:shown :resizable)))
          (sdl2-renderer (sdl2:create-renderer sdl2-window -1
                                               '(:accelerated))))
-    (sdl2:get-window-surface sdl2-window)
-    (sdl2:set-render-draw-blend-mode sdl2-renderer :blend)
-    (setf (window-size-w window) w)
-    (setf (window-size-h window) h)
     (setf (window-sdl2-window window) sdl2-window)
     (setf (window-sdl2-renderer window) sdl2-renderer)
+    (window-resize-handler window)
+    (sdl2:set-render-draw-blend-mode sdl2-renderer :blend)
     window))
 

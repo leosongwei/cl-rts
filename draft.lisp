@@ -43,7 +43,7 @@
   ENV 0.0)
 
 
-
+(init-sdl2)
 (init-window)
 (clear)
 (update)
@@ -63,34 +63,56 @@
                      *sdl2-surface*
                      (sdl2:make-rect x y 128 128)))
 
+;; (sdl2:get-renderer *sdl2-window*)
 
+;; (sdl2:set-render-draw-blend-mode *sdl2-renderer* :blend)
+;; (progn
+;;   (clear)
+;;   (show-earth-at -20 -20)
+;;   (show-earth-at 50 50)
+;;   (sdl2:set-render-draw-color *sdl2-renderer* 150 0 0 128)
+;;   (sdl2:render-fill-rect *sdl2-renderer*
+;;                          (sdl2:make-rect 30 30 128 128))
+;;   (sdl2:blit-surface *text-surface* nil *sdl2-surface* nil)
+;;   (update))
 
-(sdl2:get-renderer *sdl2-window*)
-
-(sdl2:set-render-draw-blend-mode *sdl2-renderer* :blend)
 (progn
-  (clear)
-  (show-earth-at -20 -20)
-  (show-earth-at 50 50)
-  (sdl2:set-render-draw-color *sdl2-renderer* 150 0 0 128)
-  (sdl2:render-fill-rect *sdl2-renderer*
-                         (sdl2:make-rect 30 30 128 128))
-  (sdl2:blit-surface *text-surface* nil *sdl2-surface* nil)
-  (update))
+  (clear-window *win1*)
+  (sdl2:blit-surface *text-surface* nil
+                     (window-sdl2-surface *win1*) nil)
+  (update-window *win1*))
 
-(close-window)
+(close-window *win1*)
 
-(sdl2-ttf-init)
-(defparameter *font-default*
-  (open-ttf "/usr/share/fonts/TTF/DejaVuSansMono.ttf" 16))
+(progn
+  (sdl2-ttf-init)
+  (defparameter *font-default*
+    (open-ttf "/usr/share/fonts/TTF/DejaVuSansMono.ttf" 16))
+  (set-font-style *font-default* '(:normal))
+  (defparameter *text-surface*
+    (render-text-as-surface "The quick brown fox jumps over the lazy dog, 你好世界"
+                            *font-default*
+                            0 0 255))
+  (values (sdl2:surface-width *text-surface*)
+          (sdl2:surface-height *text-surface*)))
 
-(sdl2:map-rgb  (sdl2:surface-format *sdl2-surface*) 1 2 3)
 
-(set-font-style *font-default* '(:normal))
+  (defparameter *text-texture*
+    (sdl2:create-texture-from-surface
+     (window-sdl2-renderer *win1*)
+     *text-surface*))
 
-(defparameter *text-surface*
-  (render-text-as-surface "The quick brown fox jumps over the lazy dog, 你好世界"
-                          *font-default*
-                          0 0 255))
-(sdl2:surface-width *text-surface*)
-(sdl2:surface-height *text-surface*)
+(progn
+  (clear-window *win1*)
+  (sdl2:render-copy (window-sdl2-renderer *win1*) *text-texture*
+                    :source-rect nil
+                    :dest-rect (sdl2:make-rect 0 0 490 19))
+  (update-window *win1*))
+
+
+(init-sdl2)
+(defparameter *win1* (make-window))
+(window-resize-handler *win1*)
+(clear-window *win1*)
+(update-window *win1*)
+(close-window *win1*)

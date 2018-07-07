@@ -10,7 +10,6 @@
   (defparameter *sdl2-surface* nil)
   (defparameter *sdl2-pixel-buffer* nil))
 
-
 (load "cffi.lisp")
 (load "ui.lisp")
 
