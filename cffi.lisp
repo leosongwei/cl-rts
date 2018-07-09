@@ -15,6 +15,11 @@
 (defun make-surface-from-ptr (ptr)
   (sdl2-ffi::make-sdl-surface :ptr ptr))
 
+(cffi:defcfun ("SDL_MapRGBA" sdl2-map-rgba) :uint32
+  (format-ptr :pointer) (r :uint8) (g :uint8) (b :uint8) (a :uint8))
+;; (format t "~X~%" (sdl2-map-rgba (sdl2:surface-format (make-surface 10 10)) 255 0 0 255))
+;; > FF0000FF
+
 ;; SDL2_image
 (cffi:load-foreign-library "libSDL2_image.so")
 (cffi:defcfun ("IMG_Init" sdl2-img-init) :int
