@@ -60,7 +60,7 @@
     (setf (window-sdl2-renderer window) sdl2-renderer)
     (setf (window-sdl2-window-id window)
           (sdl2:get-window-id sdl2-window))
-    (window-resize-handler window)
+    (window-resize-handler window w h)
     (sdl2:set-render-draw-blend-mode sdl2-renderer :blend)
     window))
 
