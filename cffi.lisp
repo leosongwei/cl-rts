@@ -2,6 +2,9 @@
   (sdl2:init :everything))
 ;;(init-sdl2)
 
+;; C interface
+(cffi:load-foreign-library "./cutils/libcint.so")
+
 (defun make-surface (w h)
   (sdl2:create-rgb-surface w h 32
                            :r-mask #xff000000
@@ -49,22 +52,12 @@
 (cffi:defcfun ("TTF_CloseFont" close-ttf) :void
   (font :pointer))
 
-(cffi:defcstruct sdl-color
-  (r :uint8) (g :uint8) (b :uint8) (a :uint8))
+(cffi:defcfun ("wrapper_TTF_RenderUTF8_Blended" sdl2-render-utf8-blended) :pointer
+  (font :pointer) (string :pointer) (r :uint8) (g :uint8) (b :uint8) (a :uint8))
 
-(cffi:defcfun ("TTF_RenderUTF8_Blended" sdl2-render-utf8-blended) :pointer
-  (font :pointer) (string :pointer) (fg-color sdl-color))
-
-(defun render-text-as-surface (text font &optional (color-r 128) (color-g 128)
-                                           (color-b 128) (color-a 255))
-  (cffi:with-foreign-object (sdl-color '(:struct sdl-color))
-    (cffi:with-foreign-slots ((r g b a) sdl-color (:struct sdl-color))
-      (setf r color-r
-            g color-g
-            b color-b
-            a color-a))
-    (cffi:with-foreign-string (string text)
-      (sdl2-render-utf8-blended font string sdl-color))))
+(defun render-text-as-surface (text font &optional (r 128) (g 128) (b 128) (a 255))
+  (cffi:with-foreign-string (string text)
+    (sdl2-render-utf8-blended font string r g b a)))
 
 ;; #define TTF_STYLE_NORMAL        0x00
 ;; #define TTF_STYLE_BOLD          0x01

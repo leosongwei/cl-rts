@@ -1,4 +1,5 @@
 (ql:quickload 'sdl2)
+(ql:quickload :cffi-libffi)
 
 (load "utils.lisp")
 
