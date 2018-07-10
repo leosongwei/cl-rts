@@ -2,8 +2,12 @@
   (sdl2:init :everything))
 ;;(init-sdl2)
 
-;; C interface
+(cffi:load-foreign-library "libSDL2_image.so")
+(cffi:load-foreign-library "libSDL2_ttf.so")
 (cffi:load-foreign-library "./cutils/libcint.so")
+
+;; C interface
+
 
 (defun make-surface (w h)
   (sdl2:create-rgb-surface w h 32
@@ -21,7 +25,6 @@
 ;; > FF0000FF
 
 ;; SDL2_image
-(cffi:load-foreign-library "libSDL2_image.so")
 (cffi:defcfun ("IMG_Init" sdl2-img-init) :int
   (init-flag :int))
 (defun init-sdl2-img ()
@@ -45,7 +48,6 @@
           (make-surface-from-ptr surface-ptr)))))
 
 ;; SDL2_ttf
-(cffi:load-foreign-library "libSDL2_ttf.so")
 (cffi:defcfun ("TTF_Init" sdl2-ttf-init) :int) ;; Returns: 0 on success, -1 on any error
 (cffi:defcfun ("TTF_Quit" sdl2-ttf-quit) :void)
 

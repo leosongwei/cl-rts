@@ -1,6 +1,6 @@
 CL-RTS
 ======
-A RTS written in Common LISP.
+A RTS game written in Common LISP.
 
 Copyright (C) 2018  SongWei
 
