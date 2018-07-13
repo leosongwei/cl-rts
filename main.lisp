@@ -12,7 +12,7 @@
   (defparameter *sdl2-pixel-buffer* nil))
 
 (load "cffi.lisp")
-;;(load "text-render.lisp")
+(load "text-render.lisp")
 (load "ui.lisp")
 
 (defparameter *class-slots* (make-hash-table))
