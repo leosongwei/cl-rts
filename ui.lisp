@@ -101,9 +101,8 @@
 
   ;; SDL
   (sdl-surface :initform nil)
-  (sdl-renderer :initform nil)
   (surface-update-func :initform nil)
-  (sdl-texture :initform nil)
+
   ;; mouse
   (event-mouse-down :initform nil)
   (event-mouse-up :initform nil)
@@ -118,9 +117,11 @@
 (ui-class-def
  ui-window (frame)
  ((color :initform '(255 0 0 128))
+  (sdl-renderer :initform nil)
+  (sdl-texture :initform nil)
   (surface-update-func :initform nil)))
 
-(defun ui-window-surface-update-func (ui-window)
+(defun ui-window-surface-update (ui-window)
   (let* ((sdl-surface (frame-sdl-surface ui-window))
          (pixel-format (sdl2:surface-format sdl-surface))
          (color (ui-window-color ui-window))
@@ -129,13 +130,13 @@
                                    (nth 2 color) (nth 3 color))))
     (sdl2:fill-rect sdl-surface nil sdl-color)
     ;; TODO: blit child widget pixel map here!!!
-    (when (frame-sdl-texture ui-window)
-      (sdl2:destroy-texture (frame-sdl-texture ui-window)))
-    (setf (frame-sdl-texture ui-window)
-          (sdl2:create-texture-from-surface (frame-sdl-renderer ui-window) sdl-surface))))
+    (when (ui-window-sdl-texture ui-window)
+      (sdl2:destroy-texture (ui-window-sdl-texture ui-window)))
+    (setf (ui-window-sdl-texture ui-window)
+          (sdl2:create-texture-from-surface (ui-window-sdl-renderer ui-window) sdl-surface))))
 
 (defun show-ui-window (ui-window)
-  (sdl2:render-copy (frame-sdl-renderer ui-window) (frame-sdl-texture ui-window)
+  (sdl2:render-copy (ui-window-sdl-renderer ui-window) (ui-window-sdl-texture ui-window)
                     :dest-rect (sdl2:make-rect (frame-pos-x ui-window)
                                                (frame-pos-y ui-window)
                                                (frame-size-w ui-window)
@@ -147,5 +148,10 @@
                                   :pos-x x :pos-y y
                                   :sdl-surface (make-surface w h)
                                   :sdl-renderer (window-sdl2-renderer window)
-                                  :surface-update-func #'ui-window-surface-update-func)))
+                                  :surface-update-func #'ui-window-surface-update)))
     ui-window))
+
+;; Button
+;; (ui-class-def
+;;  ui-button (frame)
+;;  ())
