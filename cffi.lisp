@@ -1,6 +1,6 @@
 (defun init-sdl2 ()
   (sdl2:init :everything))
-;;(init-sdl2)
+(init-sdl2)
 
 (cffi:load-foreign-library "libSDL2_image.so")
 (cffi:load-foreign-library "libSDL2_ttf.so")

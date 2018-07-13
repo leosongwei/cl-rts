@@ -1,4 +1,7 @@
 (defparameter *window-list* nil)
+(sdl2-ttf-init)
+(defparameter *font-default*
+  (open-ttf "/usr/share/fonts/TTF/DejaVuSansMono.ttf" 16))
 
 (defclass window ()
   ((size-w :initform 0 :type 'integer
@@ -97,7 +100,10 @@
   (pos-x :initform 0 :type 'integer)
   (pos-y :initform 0 :type 'integer)
 
+  ;; children
   (child-list :initform nil :type 'list)
+  (child-size-w :initform -1 :type 'integer)
+  (child-size-h :initform -1 :type 'integer)
 
   ;; SDL
   (sdl-surface :initform nil)
@@ -146,12 +152,65 @@
   (let ((ui-window (make-instance 'ui-window
                                   :size-w w :size-h h
                                   :pos-x x :pos-y y
+                                  :child-size-w (- w 8)
+                                  :child-size-h (- h 8)
                                   :sdl-surface (make-surface w h)
                                   :sdl-renderer (window-sdl2-renderer window)
                                   :surface-update-func #'ui-window-surface-update)))
     ui-window))
 
 ;; Button
-;; (ui-class-def
-;;  ui-button (frame)
-;;  ())
+(ui-class-def
+ ui-button (frame)
+ ((text :initform "" :type 'string)
+  (text-surface :initform nil)
+  ;; event
+  (event-mouse-motion :initform nil)
+  (event-mouse-up :initform nil)
+  (event-mouse-down :initform nil)
+  (press-func :initform nil)
+  ;; looking
+  (color :initform '(255 0 0 128))
+  (pointed-at-p :initform nil)
+  (pressed-down-p :initform nil)
+  (activated-p :initform t)))
+
+(defun ui-button-surface-update (ui-button)
+  (let ((looking :normal))
+    (when (ui-button-pointed-at-p ui-button)
+      (setf looking :pointed))
+    (when (ui-button-pressed-down-p ui-button)
+      (setf looking :pressed))
+    (when (not (ui-button-activated-p ui-button))
+      (setf looking :deactivated))
+    (case looking
+      ;; todo
+      (otherwise (let* ((color (ui-button-color ui-button))
+                        (surface (frame-sdl-surface ui-button))
+                        (pixel-format (sdl2:surface-format surface))
+                        (sdl-color (sdl2-map-rgba pixel-format
+                                                  (nth 0 color) (nth 1 color)
+                                                  (nth 2 color) (nth 3 color)))
+                        (text-surface (ui-button-text-surface ui-button))
+                        (text-w (sdl2:surface-width text-surface))
+                        (text-h (sdl2:surface-height text-surface))
+                        (center-x (/ (frame-size-w ui-button) 2))
+                        (center-y (/ (frame-size-h ui-button) 2))
+                        (pos-x (floor (- center-x (/ text-w 2))))
+                        (pos-y (floor (- center-y (/ text-h 2)))))
+                   (sdl2:fill-rect surface nil sdl-color)
+                   (sdl2:blit-surface text-surface nil
+                                      surface
+                                      (sdl2:make-rect pos-x pos-y text-w text-h)))))))
+
+(defun make-ui-button (frame text f)
+  (let* ((size-w (frame-child-size-w frame))
+         (size-h (frame-child-size-h frame))
+         (text-surface (render-text-as-surface text *font-default* 255 255 255 255))
+         (ui-button (make-instance 'ui-button
+                                   :size-h size-h :size-w size-w
+                                   :text text :text-surface text-surface
+                                   :sdl-surface (make-surface size-w size-h))))
+    (ui-button-surface-update ui-button)
+    ui-button))
+
