@@ -101,31 +101,3 @@
         (sdl2:free-surface s))
       (values surface width height))))
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
