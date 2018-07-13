@@ -8,7 +8,6 @@
 
 ;; C interface
 
-
 (defun make-surface (w h)
   (sdl2:create-rgb-surface w h 32
                            :r-mask #xff000000
@@ -24,6 +23,7 @@
 ;; (format t "~X~%" (sdl2-map-rgba (sdl2:surface-format (make-surface 10 10)) 255 0 0 255))
 ;; > FF0000FF
 
+;;---------------------------------------
 ;; SDL2_image
 (cffi:defcfun ("IMG_Init" sdl2-img-init) :int
   (init-flag :int))
@@ -47,6 +47,7 @@
           (error (format nil "Image \"~A\" Load Failed" filepath))
           (make-surface-from-ptr surface-ptr)))))
 
+;;-----------------------------------------
 ;; SDL2_ttf
 (cffi:defcfun ("TTF_Init" sdl2-ttf-init) :int) ;; Returns: 0 on success, -1 on any error
 (cffi:defcfun ("TTF_Quit" sdl2-ttf-quit) :void)
@@ -61,10 +62,6 @@
 
 (cffi:defcfun ("wrapper_TTF_RenderUTF8_Blended" sdl2-render-utf8-blended) :pointer
   (font :pointer) (string :pointer) (r :uint8) (g :uint8) (b :uint8) (a :uint8))
-
-(defun render-text-as-surface (text font &optional (r 128) (g 128) (b 128) (a 255))
-  (cffi:with-foreign-string (string text)
-    (sdl2-render-utf8-blended font string r g b a)))
 
 ;; #define TTF_STYLE_NORMAL        0x00
 ;; #define TTF_STYLE_BOLD          0x01
@@ -87,6 +84,10 @@
                       (otherwise 0)))))
     (sdl2-ttf-setfontstyle font style)))
 
+(cffi:defcfun ("TTF_SizeUTF8" sdl2-ttf-size-text) :int
+  (font :pointer) (text :pointer) (width-ptr :pointer) (height-ptr :pointer))
+
+;; -----------------------------
 ;; sdl2-event
 
 ;; typedef enum
